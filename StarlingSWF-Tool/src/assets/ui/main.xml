@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<comps>
+	<Panel width="1024" height="120">
+		<VBox x="10" y="10" spacing="6">
+			<HBox>
+				<Label text="SWF:"/>
+				<InputText id="swfSource" enabled="false" width="200"/>
+				<PushButton id="selectSwfSource" label="选择" event="click:onSelectSwfSource"/>
+				<PushButton id="refreshSwfSource" label="刷新" event="click:onRefreshSwfSource" enabled="false"/>
+			</HBox>
+			<HBox x="10" y="10" spacing="6">
+				<HBox>
+					<Label text="Image"/>
+					<ComboBox id="imageComboBox" width="180" enabled="false" event="select:onSelectImage" />
+				</HBox>
+				<HBox>
+					<Label text="Sprite:"/>
+					<ComboBox id="spriteComboBox" width="180" enabled="false" event="select:onSelectSprite" />
+				</HBox>
+				<HBox>
+					<Label text="MovieClip:"/>
+					<ComboBox id="movieClipComboBox" width="180" enabled="false" event="select:onSelectMovieClip" />
+				</HBox>
+			</HBox>
+		</VBox>
+	</Panel>
+</comps>
