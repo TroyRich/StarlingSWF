@@ -12,6 +12,7 @@ package
 		{
 			stage.align = StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
+			stage.color = 0x999999;
 			
 			addChild(new Starup());
 		}

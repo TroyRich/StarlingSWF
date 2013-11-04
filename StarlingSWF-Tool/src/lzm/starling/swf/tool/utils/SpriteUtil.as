@@ -32,6 +32,7 @@ package lzm.starling.swf.tool.utils
 				}
 				childInfo = [
 					childName,
+					type,
 					Util.formatNumber(child.x),
 					Util.formatNumber(child.y),
 					Util.formatNumber(child.scaleX),
@@ -41,15 +42,18 @@ package lzm.starling.swf.tool.utils
 				];
 				
 				if(child.name.indexOf("instance") == -1){
-					childInfo.name = child.name;
+					childInfo.push(child.name);
+				}else{
+					childInfo.push("");
 				}
 				
-				childInfo.push(type);
 				if(type == "s9"){
 					childInfo.push(Util.formatNumber(child.width));
 					childInfo.push(Util.formatNumber(child.height));
 				}else if(type == "text"){
 					childName = childInfo[0] = type;
+					childInfo.push((child as TextField).width);
+					childInfo.push((child as TextField).height);
 					childInfo.push((child as TextField).defaultTextFormat.font);
 					childInfo.push((child as TextField).defaultTextFormat.color);
 					childInfo.push((child as TextField).defaultTextFormat.size);

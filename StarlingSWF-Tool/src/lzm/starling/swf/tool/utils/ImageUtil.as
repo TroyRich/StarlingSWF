@@ -22,6 +22,8 @@ package lzm.starling.swf.tool.utils
 			Starup.tempContent.addChild(mc);
 			
 			var rect:Rectangle = mc.getRect(Starup.tempContent);
+			rect.width = rect.width < 1 ? 1 : rect.width;
+			rect.height = rect.height < 1 ? 1 : rect.height;
 			mc.x = -rect.x;
 			mc.y = -rect.y;
 			
@@ -36,7 +38,7 @@ package lzm.starling.swf.tool.utils
 		/**
 		 * 获取图片信息
 		 * */
-		public static function getImageInfo(clazz:Class):Object{
+		public static function getImageInfo(clazz:Class):Array{
 			var mc:MovieClip = new clazz();
 			
 			Starup.tempContent.addChild(mc);
@@ -45,12 +47,7 @@ package lzm.starling.swf.tool.utils
 			
 			Starup.tempContent.removeChild(mc);
 			
-			var obj:Object = {
-				piX:Util.formatNumber(-rect.x),
-				piY:Util.formatNumber(-rect.y)
-			};
-			
-			return obj;
+			return [Util.formatNumber(-rect.x),Util.formatNumber(-rect.y)];
 		}
 		
 	}

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<application xmlns="http://ns.adobe.com/air/application/3.9">
+	<id>Main</id>
+	<filename>Main</filename>
+	<name>Main</name>
+	<versionNumber>0.0.0</versionNumber>
+	<initialWindow>
+		<content>Main.swf</content>
+		<!-- <title></title> -->
+		<!-- <systemChrome></systemChrome> -->
+		<!-- <transparent></transparent> -->
+		<!-- <visible></visible> -->
+		<!-- <minimizable></minimizable> -->
+		<!-- <maximizable></maximizable> -->
+		<!-- <resizable></resizable> -->
+		<!-- <width></width> -->
+		<!-- <height></height> -->
+		<!-- <x></x> -->
+		<!-- <y></y> -->
+		<!-- <minSize></minSize> -->
+		<!-- <maxSize></maxSize> -->
+        <!-- <aspectRatio></aspectRatio> -->
+        <!-- <autoOrients></autoOrients> -->
+        <!-- <fullScreen></fullScreen> -->
+        <!-- <renderMode></renderMode> -->
+        <!-- <depthAndStencil></depthAndStencil> -->
+		<!-- <softKeyboardBehavior></softKeyboardBehavior> -->
+		<!-- <requestedDisplayResolution></requestedDisplayResolution> -->
+		<width>1024</width>
+		<height>800</height>
+		<autoOrients>false</autoOrients>
+        <fullScreen>false</fullScreen>
+        <visible>true</visible>
+        <renderMode>direct</renderMode>
+        <resizable>false</resizable>
+    </initialWindow>
+	<!-- <icon>
+		<image16x16></image16x16>
+		<image29x29></image29x29>
+		<image32x32></image32x32>
+		<image36x36></image36x36>
+		<image40x40></image40x40>
+		<image48x48></image48x48>
+		<image50x50></image50x50>
+		<image57x57></image57x57>
+		<image58x58></image58x58>
+		<image72x72></image72x72>
+		<image76x76></image76x76>
+		<image80x80></image80x80>
+		<image96x96></image96x96>
+		<image100x100></image100x100>
+		<image114x114></image114x114>
+		<image120x120></image120x120>
+		<image128x128></image128x128>
+		<image144x144></image144x144>
+		<image152x152></image152x152>
+		<image512x512></image512x512>
+		<image732x412></image732x412>
+		<image1024x1024></image1024x1024>
+	</icon> -->
+</application>

@@ -35,7 +35,7 @@ package lzm.starling.swf.tool.ui
 			super();
 			
 			_sprite = new Sprite();
-			_sprite.graphics.beginFill(0x000000,0.3);
+			_sprite.graphics.beginFill(0x000000,0.7);
 			_sprite.graphics.drawRect(0,0,100,100);
 			_sprite.graphics.endFill();
 			addChild(_sprite);

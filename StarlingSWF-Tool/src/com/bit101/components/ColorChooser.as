@@ -104,14 +104,14 @@ package com.bit101.components
 		override protected function addChildren():void
 		{
 			_input = new InputText();
-			_input.width = 45;
+			_input.width = 55;
 			_input.restrict = "0123456789ABCDEFabcdef";
 			_input.maxChars = 6;
 			addChild(_input);
 			_input.addEventListener(Event.CHANGE, onChange);
 			
 			_swatch = new Sprite();
-			_swatch.x = 50;
+			_swatch.x = 60;
 			_swatch.filters = [getShadow(2, true)];
 			addChild(_swatch);
 			

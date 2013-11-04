@@ -1,25 +1,28 @@
 package lzm.starling.swf.tool.ui
 {
+	import com.bit101.components.ColorChooser;
 	import com.bit101.components.ComboBox;
 	import com.bit101.components.InputText;
 	import com.bit101.components.PushButton;
 	
-	import flash.display.Bitmap;
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
-	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.filesystem.File;
 	import flash.net.FileFilter;
 	import flash.net.URLRequest;
-	import flash.sampler.getMasterString;
-	import flash.system.ApplicationDomain;
 	
-	import lzm.starling.swf.tool.Starup;
+	import lzm.starling.swf.Swf;
+	import lzm.starling.swf.tool.asset.Assets;
 	import lzm.starling.swf.tool.utils.ImageUtil;
 	import lzm.starling.swf.tool.utils.MovieClipUtil;
 	import lzm.starling.swf.tool.utils.SpriteUtil;
+	import lzm.starling.swf.tool.utils.Util;
+	
+	import starling.core.Starling;
+	import starling.textures.Texture;
+	import starling.utils.AssetManager;
 	
 	
 	public class MainUi extends BaseUI
@@ -32,10 +35,7 @@ package lzm.starling.swf.tool.ui
 		private var _spriteComboBox:ComboBox;
 		private var _movieClipComboBox:ComboBox;
 		
-		private var _appDomain:ApplicationDomain;
-		private var _images:Array;
-		private var _sprites:Array;
-		private var _movieClips:Array;
+		private var _bgColorChooser:ColorChooser;
 		
 		public function MainUi()
 		{
@@ -50,6 +50,8 @@ package lzm.starling.swf.tool.ui
 			_imageComboBox = uiConfig.getCompById("imageComboBox") as ComboBox;
 			_spriteComboBox = uiConfig.getCompById("spriteComboBox") as ComboBox;
 			_movieClipComboBox = uiConfig.getCompById("movieClipComboBox") as ComboBox;
+			
+			_bgColorChooser = uiConfig.getCompById("bgColor") as ColorChooser;
 		}
 		
 		/**
@@ -103,50 +105,70 @@ package lzm.starling.swf.tool.ui
 			_selectSwfSource.enabled = false;
 			_refreshSwfSource.enabled = true;
 			
-			_appDomain = loaderinfo.content.loaderInfo.applicationDomain;
-			var clazzKeys:Vector.<String> = _appDomain.getQualifiedDefinitionNames();
+			Assets.appDomain = loaderinfo.content.loaderInfo.applicationDomain;
+			var clazzKeys:Vector.<String> = Assets.appDomain.getQualifiedDefinitionNames();
 			
-			_images = [];
-			_sprites = [];
-			_movieClips = [];
+			Assets.imageDatas = {};
+			Assets.spriteDatas = {};
+			Assets.movieClipDatas = {};
+			
+			if(Assets.asset){
+				Assets.asset.purge();
+			}
+			Assets.asset = new AssetManager(1,false);
+			Assets.swf = new Swf({
+				"img":Assets.imageDatas,
+				"spr":Assets.spriteDatas,
+				"mc":Assets.movieClipDatas
+			},Assets.asset);
+			
+			var images:Array = [];
+			var sprites:Array = [];
+			var movieClips:Array = [];
 			
 			var length:int = clazzKeys.length;
+			var clazzName:String;
 			for (var i:int = 0; i < length; i++) {
-				if(clazzKeys[i].indexOf("img") == 0){
-					_images.push(clazzKeys[i]);
-				}else if(clazzKeys[i].indexOf("spr") == 0){
-					_sprites.push(clazzKeys[i]);
-				}else if(clazzKeys[i].indexOf("mc") == 0){
-					_movieClips.push(clazzKeys[i]);
+				clazzName = clazzKeys[i];
+				if(Util.getChildType(clazzName) == Swf.dataKey_Image){
+					Assets.imageDatas[clazzName] = ImageUtil.getImageInfo(Assets.getClass(clazzName));
+					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
+					images.push(clazzName);
+				}else if(Util.getChildType(clazzName) == Swf.dataKey_Sprite){
+					Assets.spriteDatas[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
+					sprites.push(clazzName);
+				}else if(Util.getChildType(clazzName) == Swf.dataKey_MovieClip){
+					Assets.movieClipDatas[clazzName] = MovieClipUtil.getMovieClipInfo(Assets.getClass(clazzName));
+					movieClips.push(clazzName);
 				}
 			}
 			
-			_images.sort();
-			_sprites.sort();
-			_movieClips.sort();
+			images.sort();
+			sprites.sort();
+			movieClips.sort();
 			
 			_imageComboBox.selectedIndex = -1;
 			_spriteComboBox.selectedIndex = -1;
 			_movieClipComboBox.selectedIndex = -1;
 			
-			if(_images.length > 0){
-				_imageComboBox.items = _images;
+			if(images.length > 0){
+				_imageComboBox.items = images;
 				_imageComboBox.enabled = true;
 			}else{
 				_imageComboBox.items = [];
 				_imageComboBox.enabled = false;
 			}
 			
-			if(_sprites.length > 0){
-				_spriteComboBox.items = _sprites;
+			if(sprites.length > 0){
+				_spriteComboBox.items = sprites;
 				_spriteComboBox.enabled = true;
 			}else{
 				_spriteComboBox.items = [];
 				_spriteComboBox.enabled = false;
 			}
 			
-			if(_movieClips.length > 0){
-				_movieClipComboBox.items = _movieClips;
+			if(movieClips.length > 0){
+				_movieClipComboBox.items = movieClips;
 				_movieClipComboBox.enabled = true;
 			}else{
 				_movieClipComboBox.items = [];
@@ -158,6 +180,7 @@ package lzm.starling.swf.tool.ui
 		 * 点击刷新按钮
 		 * */
 		public function onRefreshSwfSource(e:Event):void{
+			dispatchEvent(new UIEvent("onRefresh"));
 			loadSwf();
 		}
 		
@@ -166,10 +189,9 @@ package lzm.starling.swf.tool.ui
 		 * */
 		public function onSelectImage(e:Event):void{
 			if(_imageComboBox.selectedItem){
-				Starup.tempContent.removeChildren();
-				var bitmap:Bitmap = new Bitmap(ImageUtil.getBitmapdata(getClass(_imageComboBox.selectedItem as String),2));
-				trace(JSON.stringify(ImageUtil.getImageInfo(getClass(_imageComboBox.selectedItem as String))));
-				Starup.tempContent.addChild(bitmap);
+				var event:UIEvent = new UIEvent("selectImage");
+				event.data = {name:_imageComboBox.selectedItem};
+				dispatchEvent(event);
 			}
 		}
 		
@@ -178,11 +200,9 @@ package lzm.starling.swf.tool.ui
 		 * */
 		public function onSelectSprite(e:Event):void{
 			if(_spriteComboBox.selectedItem){
-				Starup.tempContent.removeChildren();
-				var clazz:Class = getClass(_spriteComboBox.selectedItem as String);
-				var mc:MovieClip = new clazz();
-				trace(JSON.stringify(SpriteUtil.getSpriteInfo(clazz)));
-				Starup.tempContent.addChild(mc);
+				var event:UIEvent = new UIEvent("selectSprite");
+				event.data = {name:_spriteComboBox.selectedItem};
+				dispatchEvent(event);
 			}
 		}
 		
@@ -191,20 +211,19 @@ package lzm.starling.swf.tool.ui
 		 * */
 		public function onSelectMovieClip(e:Event):void{
 			if(_movieClipComboBox.selectedItem){
-				Starup.tempContent.removeChildren();
-				var clazz:Class = getClass(_movieClipComboBox.selectedItem as String);
-				var mc:MovieClip = new clazz();
-				trace(JSON.stringify(MovieClipUtil.getMovieClipInfo(clazz)));
-				Starup.tempContent.addChild(mc);
+				var event:UIEvent = new UIEvent("selectMovieClip");
+				event.data = {name:_movieClipComboBox.selectedItem};
+				dispatchEvent(event);
 			}
+		}
+		
+		public function onColorChange(e:Event):void{
+			Starling.current.stage.color = stage.color = _bgColorChooser.value;
+			
 		}
 		
 		public function get swfPath():String{
 			return _swfPath.text;
-		}
-		
-		public function getClass(clazzName:String):Class{
-			return _appDomain.getDefinition(clazzName) as Class;
 		}
 		
 	}

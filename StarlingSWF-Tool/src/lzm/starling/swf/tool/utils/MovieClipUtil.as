@@ -41,6 +41,7 @@ package lzm.starling.swf.tool.utils
 					}
 					childInfo = [
 						childName,
+						type,
 						Util.formatNumber(child.x),
 						Util.formatNumber(child.y),
 						Util.formatNumber(child.scaleX),
@@ -50,15 +51,18 @@ package lzm.starling.swf.tool.utils
 					];
 					
 					if(child.name.indexOf("instance") == -1){
-						childInfo.name = child.name;
+						childInfo.push(child.name);
+					}else{
+						childInfo.push("");
 					}
 					
-					childInfo.push(type);
 					if(type == "s9"){
 						childInfo.push(Util.formatNumber(child.width));
 						childInfo.push(Util.formatNumber(child.height));
 					}else if(type == "text"){
 						childName = childInfo[0] = type;
+						childInfo.push((child as TextField).width);
+						childInfo.push((child as TextField).height);
 						childInfo.push((child as TextField).defaultTextFormat.font);
 						childInfo.push((child as TextField).defaultTextFormat.color);
 						childInfo.push((child as TextField).defaultTextFormat.size);
@@ -86,6 +90,10 @@ package lzm.starling.swf.tool.utils
 				}
 			}
 			
+			for(var key:String in objectCount){
+				objectCount[key] = [Util.getChildType(key),objectCount[key]];
+			}
+			
 			var frameLabels:Array = mc.currentLabels;
 			var labelSize:int = frameLabels.length;
 			
@@ -94,13 +102,13 @@ package lzm.starling.swf.tool.utils
 			for (var k:int = 0; k < labelSize; k++) {
 				frameLabel = frameLabels[k];
 				mc.gotoAndStop(frameLabel.name);
-				labels.push([frameLabel.name,frameLabel.frame]);
+				labels.push([frameLabel.name,frameLabel.frame-1]);
 				if(k > 0){
-					(labels[k - 1] as Array).push(frameLabel.frame-1);
+					(labels[k - 1] as Array).push(frameLabel.frame-2);
 				}
 				
 				if(k == (labelSize-1)){
-					(labels[k] as Array).push(mc.totalFrames);
+					(labels[k] as Array).push(mc.totalFrames-1);
 				}
 			}
 			

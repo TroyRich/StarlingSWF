@@ -13,8 +13,8 @@ package lzm.starling.swf.tool.utils
 		 * 返回子集类型
 		 * */
 		public static function getChildType(childName:String):String{
-			var types:Array = ["img","spr","mc","btn","s9","bat","flash.text::TextField"];
-			var types1:Array = ["img","spr","mc","btn","s9","bat","text"];
+			var types:Array = ["img","spr","mc","btn","s9","bat","flash.text::TextField","text"];
+			var types1:Array = ["img","spr","mc","btn","s9","bat","text","text"];
 			for (var i:int = 0; i < types.length; i++) {
 				if(childName.indexOf(types[i]) == 0){
 					return types1[i];
