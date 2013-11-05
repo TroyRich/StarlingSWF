@@ -10,8 +10,14 @@ package lzm.starling.swf.tool
 	import lzm.starling.swf.tool.starling.StarlingStarup;
 	import lzm.starling.swf.tool.ui.Loading;
 	import lzm.starling.swf.tool.ui.MainUi;
+	import lzm.starling.swf.tool.ui.MovieClipPropertyUi;
 	import lzm.starling.swf.tool.ui.UIEvent;
 	
+	/**
+	 * 
+	 * @author zmliu
+	 * 
+	 */
 	public class Starup extends Sprite
 	{
 		
@@ -19,6 +25,7 @@ package lzm.starling.swf.tool
 		public static var tempContent:Sprite;
 		
 		private var _mainUi:MainUi;
+		private var _movieClipProUi:MovieClipPropertyUi;
 		
 		private var _starlingStarup:StarlingStarup;
 		
@@ -40,7 +47,13 @@ package lzm.starling.swf.tool
 			_mainUi.addEventListener("selectImage",onSelectImage);
 			_mainUi.addEventListener("selectSprite",onSelectSprite);
 			_mainUi.addEventListener("selectMovieClip",onSelectMovieClip);
+			_mainUi.addEventListener("selectButton",onSelectButton);
+			_mainUi.addEventListener("selectScale9",onSelectScale9);
 			addChild(_mainUi);
+			
+			_movieClipProUi = new MovieClipPropertyUi();
+			_movieClipProUi.x = 1024 - 160;
+			_movieClipProUi.y = 120;
 			
 			initStarling();
 		}
@@ -62,6 +75,8 @@ package lzm.starling.swf.tool
 		}
 		
 		private function onRefresh(e:UIEvent):void{
+			hidePropertyPanel();
+			
 			_starlingStarup.clear();
 		}
 		
@@ -69,6 +84,8 @@ package lzm.starling.swf.tool
 		 * 选择了一张图片
 		 * */
 		private function onSelectImage(e:UIEvent):void{
+			hidePropertyPanel();
+			
 			_starlingStarup.showObject(Assets.swf.createImage(e.data.name));
 		}
 		
@@ -76,6 +93,8 @@ package lzm.starling.swf.tool
 		 * 选择了sprite
 		 * */
 		private function onSelectSprite(e:UIEvent):void{
+			hidePropertyPanel();
+			
 			_starlingStarup.showObject(Assets.swf.createSprite(e.data.name));
 		}
 		
@@ -83,7 +102,38 @@ package lzm.starling.swf.tool
 		 * 选择moviecllip
 		 * */
 		private function onSelectMovieClip(e:UIEvent):void{
-			_starlingStarup.showObject(Assets.swf.createMovieClip(e.data.name));
+			hidePropertyPanel();
+			showPropertyPanel();
+			
+			var mc:SwfMovieClip = Assets.swf.createMovieClip(e.data.name);
+			mc.name = e.data.name;
+			_movieClipProUi.movieClip = mc;
+			_starlingStarup.showObject(mc);
+		}
+		
+		/**
+		 * 选择moviecllip
+		 * */
+		private function onSelectButton(e:UIEvent):void{
+			hidePropertyPanel();
+			
+			_starlingStarup.showObject(Assets.swf.createButton(e.data.name));
+		}
+		
+		/**
+		 * 选择moviecllip
+		 * */
+		private function onSelectScale9(e:UIEvent):void{
+			hidePropertyPanel();
+			_starlingStarup.showScale9(e.data.name);
+		}
+		
+		private function showPropertyPanel():void{
+			addChild(_movieClipProUi);
+		}
+		
+		private function hidePropertyPanel():void{
+			if(_movieClipProUi.parent) _movieClipProUi.parent.removeChild(_movieClipProUi);
 		}
 		
 	}

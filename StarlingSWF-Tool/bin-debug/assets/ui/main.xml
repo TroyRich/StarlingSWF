@@ -32,9 +32,19 @@
 					<ComboBox id="scale9ComboBox" width="180" enabled="false" event="select:onSelectScale9" />
 				</HBox>
 			</HBox>
-			<HBox>
-				<Label text="背景颜色:"/>
-				<ColorChooser id="bgColor" usePopup="true" value="0x999999" width="50" event="change:onColorChange" />
+			<HBox spacing="24">
+				<HBox>
+					<Label text="背景颜色:"/>
+					<ColorChooser id="bgColor" usePopup="true" value="0x999999" event="change:onColorChange" />
+				</HBox>
+				<HUISlider label="帧率:" id="fpsValue" value="60" maximum="60" minimum="24" event="change:onFpsChange"/>
+				<Panel width="246" height="28">
+					<HBox alignment="none">
+						<Label y="7" text="导出倍数:"/>
+						<NumericStepper y="8" id="exportScale" value="1" minimum="1" enabled="false"/>
+						<PushButton y="6" id="exportBtn" label="导出" event="click:onExport" enabled="false"/>
+					</HBox>
+				</Panel>
 			</HBox>
 		</VBox>
 	</Panel>

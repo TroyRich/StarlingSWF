@@ -2,16 +2,24 @@ package lzm.starling.swf.tool.ui
 {
 	import com.bit101.components.ColorChooser;
 	import com.bit101.components.ComboBox;
+	import com.bit101.components.HUISlider;
 	import com.bit101.components.InputText;
+	import com.bit101.components.NumericStepper;
 	import com.bit101.components.PushButton;
 	
+	import flash.display.BitmapData;
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
+	import flash.display.PNGEncoderOptions;
 	import flash.events.Event;
-	import flash.events.ProgressEvent;
 	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
+	import flash.geom.Rectangle;
 	import flash.net.FileFilter;
 	import flash.net.URLRequest;
+	import flash.utils.ByteArray;
+	import flash.utils.setTimeout;
 	
 	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.tool.asset.Assets;
@@ -19,12 +27,18 @@ package lzm.starling.swf.tool.ui
 	import lzm.starling.swf.tool.utils.MovieClipUtil;
 	import lzm.starling.swf.tool.utils.SpriteUtil;
 	import lzm.starling.swf.tool.utils.Util;
+	import lzm.util.LSOManager;
 	
 	import starling.core.Starling;
 	import starling.textures.Texture;
 	import starling.utils.AssetManager;
 	
 	
+	/**
+	 * 
+	 * @author zmliu
+	 * 
+	 */
 	public class MainUi extends BaseUI
 	{
 		
@@ -34,8 +48,15 @@ package lzm.starling.swf.tool.ui
 		private var _imageComboBox:ComboBox;
 		private var _spriteComboBox:ComboBox;
 		private var _movieClipComboBox:ComboBox;
+		private var _buttonComboBox:ComboBox;
+		private var _s9ComboBox:ComboBox;
 		
 		private var _bgColorChooser:ColorChooser;
+		private var _fpsValue:HUISlider;
+		
+		private var _exportScale:NumericStepper;
+		private var _exportBtn:PushButton;
+		private var _exportPath:String;
 		
 		public function MainUi()
 		{
@@ -50,8 +71,14 @@ package lzm.starling.swf.tool.ui
 			_imageComboBox = uiConfig.getCompById("imageComboBox") as ComboBox;
 			_spriteComboBox = uiConfig.getCompById("spriteComboBox") as ComboBox;
 			_movieClipComboBox = uiConfig.getCompById("movieClipComboBox") as ComboBox;
+			_buttonComboBox = uiConfig.getCompById("buttonComboBox") as ComboBox;
+			_s9ComboBox = uiConfig.getCompById("scale9ComboBox") as ComboBox;
 			
 			_bgColorChooser = uiConfig.getCompById("bgColor") as ColorChooser;
+			_fpsValue = uiConfig.getCompById("fpsValue") as HUISlider;
+			
+			_exportScale = uiConfig.getCompById("exportScale") as NumericStepper;
+			_exportBtn = uiConfig.getCompById("exportBtn") as PushButton;
 		}
 		
 		/**
@@ -71,6 +98,8 @@ package lzm.starling.swf.tool.ui
 			
 			_swfPath.text = file.url;
 			
+			LSOManager.NAME = Util.getName(_swfPath.text);
+			
 			loadSwf();
 		}
 		
@@ -80,16 +109,8 @@ package lzm.starling.swf.tool.ui
 		private function loadSwf():void{
 			Loading.instance.show();
 			var loader:Loader = new Loader();
-			loader.contentLoaderInfo.addEventListener(ProgressEvent.PROGRESS,loadProgress);
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE,loadSwfComplete);
-			loader.load(new URLRequest(swfPath));
-		}
-		
-		/**
-		 * 加载进度
-		 * */
-		private function loadProgress(e:ProgressEvent):void{
-			Loading.instance.value = e.bytesLoaded / e.bytesTotal;
+			loader.load(new URLRequest(_swfPath.text));
 		}
 		
 		/**
@@ -99,11 +120,12 @@ package lzm.starling.swf.tool.ui
 			Loading.instance.hide();
 			
 			var loaderinfo:LoaderInfo = e.target as LoaderInfo;
-			loaderinfo.removeEventListener(ProgressEvent.PROGRESS,loadProgress);
 			loaderinfo.removeEventListener(Event.COMPLETE,loadSwfComplete);
 			
 			_selectSwfSource.enabled = false;
 			_refreshSwfSource.enabled = true;
+			_exportBtn.enabled = true;
+			_exportScale.enabled = true;
 			
 			Assets.appDomain = loaderinfo.content.loaderInfo.applicationDomain;
 			var clazzKeys:Vector.<String> = Assets.appDomain.getQualifiedDefinitionNames();
@@ -111,20 +133,19 @@ package lzm.starling.swf.tool.ui
 			Assets.imageDatas = {};
 			Assets.spriteDatas = {};
 			Assets.movieClipDatas = {};
+			Assets.buttons = {};
+			Assets.s9s = {};
 			
 			if(Assets.asset){
 				Assets.asset.purge();
 			}
 			Assets.asset = new AssetManager(1,false);
-			Assets.swf = new Swf({
-				"img":Assets.imageDatas,
-				"spr":Assets.spriteDatas,
-				"mc":Assets.movieClipDatas
-			},Assets.asset);
 			
 			var images:Array = [];
 			var sprites:Array = [];
 			var movieClips:Array = [];
+			var buttons:Array = [];
+			var s9s:Array = [];
 			
 			var length:int = clazzKeys.length;
 			var clazzName:String;
@@ -138,18 +159,40 @@ package lzm.starling.swf.tool.ui
 					Assets.spriteDatas[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
 					sprites.push(clazzName);
 				}else if(Util.getChildType(clazzName) == Swf.dataKey_MovieClip){
-					Assets.movieClipDatas[clazzName] = MovieClipUtil.getMovieClipInfo(Assets.getClass(clazzName));
+					Assets.movieClipDatas[clazzName] = MovieClipUtil.getMovieClipInfo(clazzName,Assets.getClass(clazzName));
 					movieClips.push(clazzName);
+				}else if(Util.getChildType(clazzName) == Swf.dataKey_Button){
+					Assets.buttons[clazzName] = SpriteUtil.getSpriteInfo(Assets.getClass(clazzName));
+					buttons.push(clazzName);
+				}else if(Util.getChildType(clazzName) == Swf.dataKey_Scale9){
+					Assets.s9s[clazzName] = "";
+					Assets.asset.addTexture(clazzName,Texture.fromBitmapData(ImageUtil.getBitmapdata(Assets.getClass(clazzName),1)));
+					s9s.push(clazzName);
 				}
 			}
+			
+			var swfData:ByteArray = new ByteArray();
+			swfData.writeUTFBytes(JSON.stringify({
+				"img":Assets.imageDatas,
+				"spr":Assets.spriteDatas,
+				"mc":Assets.movieClipDatas,
+				"btn":Assets.buttons,
+				"s9":Assets.s9s
+			}));
+			swfData.compress();
+			Assets.swf = new Swf(swfData,Assets.asset);
 			
 			images.sort();
 			sprites.sort();
 			movieClips.sort();
+			buttons.sort();
+			s9s.sort();
 			
 			_imageComboBox.selectedIndex = -1;
 			_spriteComboBox.selectedIndex = -1;
 			_movieClipComboBox.selectedIndex = -1;
+			_buttonComboBox.selectedIndex = -1;
+			_s9ComboBox.selectedIndex = -1;
 			
 			if(images.length > 0){
 				_imageComboBox.items = images;
@@ -173,6 +216,22 @@ package lzm.starling.swf.tool.ui
 			}else{
 				_movieClipComboBox.items = [];
 				_movieClipComboBox.enabled = false;
+			}
+			
+			if(buttons.length > 0){
+				_buttonComboBox.items = buttons;
+				_buttonComboBox.enabled = true;
+			}else{
+				_buttonComboBox.items = [];
+				_buttonComboBox.enabled = false;
+			}
+			
+			if(s9s.length > 0){
+				_s9ComboBox.items = s9s;
+				_s9ComboBox.enabled = true;
+			}else{
+				_s9ComboBox.items = [];
+				_s9ComboBox.enabled = false;
 			}
 		}
 		
@@ -217,14 +276,104 @@ package lzm.starling.swf.tool.ui
 			}
 		}
 		
-		public function onColorChange(e:Event):void{
-			Starling.current.stage.color = stage.color = _bgColorChooser.value;
-			
+		/**
+		 * 选择button
+		 * */
+		public function onSelectButton(e:Event):void{
+			if(_buttonComboBox.selectedItem){
+				var event:UIEvent = new UIEvent("selectButton");
+				event.data = {name:_buttonComboBox.selectedItem};
+				dispatchEvent(event);
+			}
 		}
 		
-		public function get swfPath():String{
-			return _swfPath.text;
+		/**
+		 * 选择s9
+		 * */
+		public function onSelectScale9(e:Event):void{
+			if(_s9ComboBox.selectedItem){
+				var event:UIEvent = new UIEvent("selectScale9");
+				event.data = {name:_s9ComboBox.selectedItem};
+				dispatchEvent(event);
+			}
 		}
+		
+		public function onColorChange(e:Event):void{
+			Starling.current.stage.color = stage.color = _bgColorChooser.value;
+		}
+		
+		public function onFpsChange(e:Event):void{
+			stage.frameRate = _fpsValue.value;
+		}
+		
+		public function onExport(e:Event):void{
+			var file:File = new File();
+			file.browseForDirectory("输出路径");
+			file.addEventListener(Event.SELECT,selectExportPathOk);
+		}
+		
+		/**
+		 * 选择完swf
+		 * */
+		private function selectExportPathOk(e:Event):void{
+			var file:File = e.target as File;
+			file.removeEventListener(Event.SELECT,selectExportPathOk);
+			
+			Loading.instance.show();
+			
+			setTimeout(function():void{
+				__export(file.url);
+			},30);
+		}
+		
+		private function __export(exportPath:String):void{
+			var imageExportPath:String = exportPath + "/images/";
+			var bigImageExportPath:String = exportPath + "/images/big/";
+			var dataExportPath:String = exportPath + "/data/layout.bytes";
+			
+			var images:Array = _imageComboBox.items;
+			var length:int = images.length;
+			
+			var exportFile:File;
+			var exportFileStream:FileStream;
+			
+			var bitmapdata:BitmapData;
+			var imageData:ByteArray;
+			
+			for (var i:int = 0; i < length; i++) {
+				bitmapdata = ImageUtil.getBitmapdata(Assets.getClass(images[i]),_exportScale.value);
+				imageData = bitmapdata.encode(new Rectangle(0,0,bitmapdata.width,bitmapdata.height),new PNGEncoderOptions());
+				
+				if(bitmapdata.width > (150 * _exportScale.value) && bitmapdata.height > (150 * _exportScale.value)){
+					exportFile = new File(bigImageExportPath + images[i] + ".png");
+				}else{
+					exportFile = new File(imageExportPath + images[i] + ".png");
+				}
+				
+				exportFileStream = new FileStream();
+				exportFileStream.open(exportFile,FileMode.WRITE);
+				exportFileStream.writeBytes(imageData);
+				exportFileStream.close();
+			}
+			
+			var swfData:ByteArray = new ByteArray();
+			swfData.writeUTFBytes(JSON.stringify({
+				"img":Assets.imageDatas,
+				"spr":Assets.spriteDatas,
+				"mc":Assets.movieClipDatas,
+				"btn":Assets.buttons,
+				"s9":Assets.s9s
+			}));
+			swfData.compress();
+			exportFile = new File(dataExportPath);
+			exportFileStream = new FileStream();
+			exportFileStream.open(exportFile,FileMode.WRITE);
+			exportFileStream.writeBytes(swfData);
+			exportFileStream.close();
+			
+			Loading.instance.hide();
+		}
+		
 		
 	}
 }

@@ -7,11 +7,13 @@ package lzm.starling.swf.tool.utils
 	
 	import lzm.starling.swf.tool.Starup;
 
+	/**
+	 * 
+	 * @author zmliu
+	 * 
+	 */
 	public class SpriteUtil
 	{
-		/**
-		 * 获取图片信息
-		 * */
 		public static function getSpriteInfo(clazz:Class):Array{
 			var mc:MovieClip = new clazz();
 			
@@ -38,7 +40,8 @@ package lzm.starling.swf.tool.utils
 					Util.formatNumber(child.scaleX),
 					Util.formatNumber(child.scaleY),
 					MatrixUtil.getSkewX(child.transform.matrix),
-					MatrixUtil.getSkewY(child.transform.matrix)
+					MatrixUtil.getSkewY(child.transform.matrix),
+					child.alpha
 				];
 				
 				if(child.name.indexOf("instance") == -1){

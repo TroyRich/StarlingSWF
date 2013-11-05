@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <application xmlns="http://ns.adobe.com/air/application/3.9">
 	<id>Main</id>
-	<filename>Main</filename>
+	<filename>StarlingSwf</filename>
 	<name>Main</name>
 	<versionNumber>0.0.0</versionNumber>
 	<initialWindow>
 		<content>StarlingSWF_Tool.swf</content>
-		<!-- <title></title> -->
 		<!-- <systemChrome></systemChrome> -->
 		<!-- <transparent></transparent> -->
 		<!-- <visible></visible> -->
@@ -26,6 +25,7 @@
         <!-- <depthAndStencil></depthAndStencil> -->
 		<!-- <softKeyboardBehavior></softKeyboardBehavior> -->
 		<!-- <requestedDisplayResolution></requestedDisplayResolution> -->
+		<title>一键导出SWF到Starling</title>
 		<width>1024</width>
 		<height>800</height>
 		<autoOrients>false</autoOrients>

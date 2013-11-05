@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<comps>
-	<VBox id="vbox" spacing="6" alignment="center">
-		<Label text="loading..."/>
-		<ProgressBar id="progress"  />
-	</VBox>
-</comps>

@@ -2,6 +2,11 @@ package lzm.starling.swf.tool.ui
 {
 	import flash.events.Event;
 	
+	/**
+	 * 
+	 * @author zmliu
+	 * 
+	 */
 	public class UIEvent extends Event
 	{
 		

@@ -7,13 +7,16 @@ package lzm.starling.swf.tool.utils
 	import flash.utils.getQualifiedClassName;
 	
 	import lzm.starling.swf.tool.Starup;
+	import lzm.util.LSOManager;
 
+	/**
+	 * 
+	 * @author zmliu
+	 * 
+	 */
 	public class MovieClipUtil
 	{
-		/**
-		 * 获取图片信息
-		 * */
-		public static function getMovieClipInfo(clazz:Class):Object{
+		public static function getMovieClipInfo(clazzName:String,clazz:Class):Object{
 			var mc:MovieClip = new clazz();
 			
 			Starup.tempContent.addChild(mc);
@@ -47,7 +50,8 @@ package lzm.starling.swf.tool.utils
 						Util.formatNumber(child.scaleX),
 						Util.formatNumber(child.scaleY),
 						MatrixUtil.getSkewX(child.transform.matrix),
-						MatrixUtil.getSkewY(child.transform.matrix)
+						MatrixUtil.getSkewY(child.transform.matrix),
+						child.alpha
 					];
 					
 					if(child.name.indexOf("instance") == -1){
@@ -114,7 +118,12 @@ package lzm.starling.swf.tool.utils
 			
 			Starup.tempContent.removeChild(mc);
 			
-			return {frames:frameInfos,labels:labels,objCount:objectCount};
+			return {
+				frames:frameInfos,
+				labels:labels,
+				objCount:objectCount,
+				loop:((LSOManager.get(clazzName) == null) ? true : LSOManager.get(clazzName))
+			};
 		}
 		
 		

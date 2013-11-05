@@ -5,6 +5,11 @@ package lzm.starling.swf
 	
 	import lzm.starling.swf.display.SwfMovieClip;
 
+	/**
+	 * 
+	 * @author zmliu
+	 * 
+	 */
 	public class SwfUpdateManager
 	{
 		
@@ -22,9 +27,9 @@ package lzm.starling.swf
 			var index:int = _movieClips.indexOf(movieClip);
 			if(index == -1){
 				_movieClips.push(movieClip);
-			}
-			if(_movieClips.length == 1){
-				_stage.addEventListener(Event.ENTER_FRAME,enterFrame);
+				if(_movieClips.length == 1){
+					_stage.addEventListener(Event.ENTER_FRAME,enterFrame);
+				}
 			}
 		}
 		
@@ -39,9 +44,8 @@ package lzm.starling.swf
 		}
 		
 		private static function enterFrame(e:Event):void{
-			var length:int = _movieClips.length;
-			for (var i:int = 0; i < length; i++) {
-				_movieClips[i].update();
+			for each (var mc:SwfMovieClip in _movieClips) {
+				mc.update();
 			}
 		}
 		

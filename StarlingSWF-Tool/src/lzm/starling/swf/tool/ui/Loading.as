@@ -1,5 +1,6 @@
 package lzm.starling.swf.tool.ui
 {
+	import com.bit101.components.Label;
 	import com.bit101.components.ProgressBar;
 	import com.bit101.components.VBox;
 	
@@ -7,6 +8,11 @@ package lzm.starling.swf.tool.ui
 	import flash.display.Stage;
 	import flash.events.Event;
 
+	/**
+	 * 
+	 * @author zmliu
+	 * 
+	 */
 	public class Loading extends BaseUI
 	{
 		
@@ -26,8 +32,7 @@ package lzm.starling.swf.tool.ui
 		}
 		
 		
-		private var _vbox:VBox;
-		private var _progressBar:ProgressBar;
+		private var _label:Label;
 		private var _sprite:Sprite;
 		
 		public function Loading()
@@ -40,16 +45,7 @@ package lzm.starling.swf.tool.ui
 			_sprite.graphics.endFill();
 			addChild(_sprite);
 			
-			loadUi("assets/ui/loading.xml");
-		}
-		
-		protected override function loadXMLComplete(e:Event):void{
-			_vbox = uiConfig.getCompById("vbox") as VBox;
-			_progressBar = uiConfig.getCompById("progress") as ProgressBar;
-		}
-		
-		public function set value(value:Number):void{
-			_progressBar.value = value;
+			_label = new Label(this,0,0,"Loading...");
 		}
 		
 		public function show():void{
@@ -59,8 +55,8 @@ package lzm.starling.swf.tool.ui
 			_sprite.width = w;
 			_sprite.height = h;
 			
-			_vbox.x = (w - _vbox.width)/2;
-			_vbox.y = (h - _vbox.height)/2;
+			_label.x = (w - _label.width)/2;
+			_label.y = (h - _label.height)/2;
 			
 			_stage.addChild(this);
 		}

@@ -5,6 +5,11 @@ package lzm.starling.swf.tool.ui
 	import flash.display.Sprite;
 	import flash.events.Event;
 
+	/**
+	 * 
+	 * @author zmliu
+	 * 
+	 */
 	public class BaseUI extends Sprite
 	{
 		

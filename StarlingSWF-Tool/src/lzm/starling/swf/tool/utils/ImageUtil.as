@@ -7,8 +7,10 @@ package lzm.starling.swf.tool.utils
 	import lzm.starling.swf.tool.Starup;
 
 	/**
-	 * 图片工具
-	 * */
+	 * 
+	 * @author zmliu
+	 * 
+	 */
 	public class ImageUtil
 	{
 		
