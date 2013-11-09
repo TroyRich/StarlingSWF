@@ -27,7 +27,6 @@ package lzm.starling.swf.tool.ui
 	import lzm.starling.swf.tool.utils.MovieClipUtil;
 	import lzm.starling.swf.tool.utils.SpriteUtil;
 	import lzm.starling.swf.tool.utils.Util;
-	import lzm.util.LSOManager;
 	
 	import starling.core.Starling;
 	import starling.textures.Texture;
@@ -98,9 +97,10 @@ package lzm.starling.swf.tool.ui
 			
 			_swfPath.text = file.url;
 			
-			LSOManager.NAME = Util.getName(_swfPath.text);
+			Assets.openTempFile(Util.getName(_swfPath.text),function():void{
+				loadSwf();
+			});
 			
-			loadSwf();
 		}
 		
 		/**
@@ -332,6 +332,7 @@ package lzm.starling.swf.tool.ui
 			var dataExportPath:String = exportPath + "/data/layout.bytes";
 			
 			var images:Array = _imageComboBox.items;
+			images = images.concat(_s9ComboBox.items);
 			var length:int = images.length;
 			
 			var exportFile:File;
@@ -350,10 +351,17 @@ package lzm.starling.swf.tool.ui
 					exportFile = new File(imageExportPath + images[i] + ".png");
 				}
 				
-				exportFileStream = new FileStream();
-				exportFileStream.open(exportFile,FileMode.WRITE);
-				exportFileStream.writeBytes(imageData);
-				exportFileStream.close();
+				try
+				{
+					exportFileStream = new FileStream();
+					exportFileStream.open(exportFile,FileMode.WRITE);
+					exportFileStream.writeBytes(imageData);
+					exportFileStream.close();
+				} 
+				catch(error:Error) 
+				{
+					trace(exportFile.url);
+				}
 			}
 			
 			var swfData:ByteArray = new ByteArray();

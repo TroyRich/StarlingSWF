@@ -37,7 +37,7 @@ package lzm.starling.swf
 			SwfUpdateManager.init(stage);
 		}
 		
-		public const createFuns:Object = {
+		private const createFuns:Object = {
 			"img":createImage,
 			"spr":createSprite,
 			"mc":createMovieClip,
@@ -54,6 +54,20 @@ package lzm.starling.swf
 			
 			this._swfDatas = JSON.parse(new String(swfData));
 			this._assets = assets;
+		}
+		
+		/**
+		 * swf数据
+		 * */
+		public function get swfData():Object{
+			return _swfDatas;
+		}
+		
+		/**
+		 * 获取资源
+		 * */
+		public function get assets():AssetManager{
+			return _assets;
 		}
 		
 		/**
@@ -149,7 +163,7 @@ package lzm.starling.swf
 		 * */
 		public function createS9Image(name:String,data:Array=null):Scale9Image{
 			var texture:Texture = _assets.getTexture(name);
-			var w:Number = texture.width * 0.25;
+			var w:Number = texture.width * 0.25 * _assets.scaleFactor;
 			var s9Texture:Scale9Textures = new Scale9Textures(texture,new Rectangle(w,w,1,1));
 			var s9image:Scale9Image = new Scale9Image(s9Texture,_assets.scaleFactor);
 			

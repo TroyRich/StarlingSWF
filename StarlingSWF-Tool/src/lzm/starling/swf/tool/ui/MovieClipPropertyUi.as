@@ -6,9 +6,9 @@ package lzm.starling.swf.tool.ui
 	
 	import flash.events.Event;
 	
+	import lzm.starling.swf.Swf;
 	import lzm.starling.swf.display.SwfMovieClip;
 	import lzm.starling.swf.tool.asset.Assets;
-	import lzm.util.LSOManager;
 
 	/**
 	 * 
@@ -58,7 +58,8 @@ package lzm.starling.swf.tool.ui
 			_movieClip.loop = _isLoop.selected;
 			
 			Assets.movieClipDatas[_movieClip.name]["loop"] = _movieClip.loop;
-			LSOManager.put(_movieClip.name,_movieClip.loop);
+			Assets.swf.swfData[Swf.dataKey_MovieClip][_movieClip.name]["loop"] = _movieClip.loop;
+			Assets.putTempData(_movieClip.name,_movieClip.loop);
 		}
 		
 		public function onPlay(e:Event):void{

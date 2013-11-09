@@ -7,7 +7,7 @@ package lzm.starling.swf.tool.utils
 	import flash.utils.getQualifiedClassName;
 	
 	import lzm.starling.swf.tool.Starup;
-	import lzm.util.LSOManager;
+	import lzm.starling.swf.tool.asset.Assets;
 
 	/**
 	 * 
@@ -122,7 +122,7 @@ package lzm.starling.swf.tool.utils
 				frames:frameInfos,
 				labels:labels,
 				objCount:objectCount,
-				loop:((LSOManager.get(clazzName) == null) ? true : LSOManager.get(clazzName))
+				loop:((Assets.getTempData(clazzName) == null) ? true : Assets.getTempData(clazzName))
 			};
 		}
 		
